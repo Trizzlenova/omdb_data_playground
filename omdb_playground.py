@@ -11,14 +11,13 @@ import json
 
 key=KEY
 url = 'http://www.omdbapi.com/'
-all_episodes = []
 show='south park'
 season=1
 
 def urlify_string(string):
     return string.replace(' ', '+')
 
-def get_season_episodes(URL, KEY, SHOW, SEASON):
+def get_and_save_season(URL, KEY, SHOW, SEASON=1, ALL_EPISODES=[]):
     params = {
         'apikey': KEY,
         't': urlify_string(SHOW),
@@ -26,30 +25,36 @@ def get_season_episodes(URL, KEY, SHOW, SEASON):
         'r': 'json'
     }
     
-    response = requests.get(url, params=params)
-    return json.loads(response.text)
-
-def save_season(SEASON):
-    if SEASON['Response']:
-        episodes = data['Episodes']
-        for episode in episodes:
-            all_episodes.append(episode)
-    return False
-
-
-
-data = json.loads(sp.text)
-if data['Response']:
-    episodes = data['Episodes']
-    for episode in episodes:
-        all_episodes.append(episode)
-    season = season + 1
+    response = requests.get(URL, params=params)
+    data = json.loads(response.text)
+    if SEASON == 1:
+        ALL_EPISODES = []
+    if data['Response']:
+        ALL_EPISODES.append(data)
+            
+        next_season = int(data['Season']) + 1
+        total_seasons = int(data['totalSeasons'])
+        if next_season > total_seasons:
+            return ALL_EPISODES
+        return get_and_save_season(URL, KEY, SHOW, next_season)
     
+    return ALL_EPISODES
 
-# break needs to be response = False
+def colorize_rating(RATING):
+    rating = float(RATING)
+    if rating >= 9:
+        return 'darkgreen'
+    elif rating >= 8:
+        return 'green'
+    elif rating >= 7:
+        return 'yellow'
+    elif rating >= 6:
+        return 'orange'
+    else:
+        return 'red'
 
-for episode in sp:
-   for key, value in episode.items():
-       print(value)
-       
-my_json = sp.decode('utf8').replace("'", '"')
+def add_rating_heat_to_episodes(DATA):
+    for episodes in DATA:
+        for episode in episodes['Episodes']:
+            episode['Heat'] = colorize_rating(episode['imdbRating'])
+    return DATA
