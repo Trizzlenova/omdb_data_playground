@@ -57,9 +57,12 @@ def colorize_rating(RATING):
 
 def add_season_and_rating_heat_to_episodes(DATA):
     for episodes in DATA:
+        number_in_season = 1
         for episode in episodes['Episodes']:
+            episode['numberInSeason'] = number_in_season
             episode['Season'] = episodes['Season']
             episode['Heat'] = colorize_rating(episode['imdbRating'])
+            number_in_season = number_in_season+1
     return create_episode_dataframe(DATA)
 
 
@@ -67,10 +70,23 @@ import pandas as pd
 
 def create_episode_dataframe(DATA):
     episode_list = [episode for episodes in DATA for episode in episodes['Episodes']]
-    return pd.DataFrame(episode_list)
+    df = pd.DataFrame(episode_list)
+    df = convert_column_to_numeric(df, ['imdbRating', 'Season', 'Episode'])
+    
+    return df.sort_values(['Season', 'Episode'], ascending=[True, True])
 
+def convert_column_to_numeric(DATA, COLUMN_LIST):
+    for i in COLUMN_LIST:
+        DATA[i] = pd.to_numeric(DATA[i])
+    return DATA
+    
 
-import matplotlib
+plt.figure(figsize=(12,8))
+sns.heatmap(ratings, annot=True, linewidths=1, cmap=mpl.cm.get_cmap('RdYlGn'))
+plt.show()
+
+import matplotlib as mpl
+mpl.
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
