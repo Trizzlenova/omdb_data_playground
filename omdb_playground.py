@@ -81,12 +81,13 @@ def convert_column_to_numeric(DATA, COLUMN_LIST):
     return DATA
     
 
+# TODO: see if clickable links can be added (click a cell to go to imdb ep page)
+ratings = pd.pivot_table(df, 'imdbRating', 'Season', 'numberInSeason')
 plt.figure(figsize=(12,8))
 sns.heatmap(ratings, annot=True, linewidths=1, cmap=mpl.cm.get_cmap('RdYlGn'))
 plt.show()
 
 import matplotlib as mpl
-mpl.
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
