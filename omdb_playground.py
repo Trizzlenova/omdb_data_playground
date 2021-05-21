@@ -29,16 +29,18 @@ def get_and_save_season(URL, KEY, SHOW, SEASON=1, ALL_EPISODES=[]):
     data = json.loads(response.text)
     if SEASON == 1:
         ALL_EPISODES = []
+        
     if data['Response']:
+        print(SEASON)
         ALL_EPISODES.append(data)
             
         next_season = int(data['Season']) + 1
         total_seasons = int(data['totalSeasons'])
         if next_season > total_seasons:
-            return ALL_EPISODES
-        return get_and_save_season(URL, KEY, SHOW, next_season)
+            return add_season_and_rating_heat_to_episodes(ALL_EPISODES)
+        return get_and_save_season(URL, KEY, SHOW, next_season, ALL_EPISODES)
     
-    return ALL_EPISODES
+    return add_season_and_rating_heat_to_episodes(ALL_EPISODES)
 
 def colorize_rating(RATING):
     rating = float(RATING)
@@ -53,8 +55,24 @@ def colorize_rating(RATING):
     else:
         return 'red'
 
-def add_rating_heat_to_episodes(DATA):
+def add_season_and_rating_heat_to_episodes(DATA):
     for episodes in DATA:
         for episode in episodes['Episodes']:
+            episode['Season'] = episodes['Season']
             episode['Heat'] = colorize_rating(episode['imdbRating'])
-    return DATA
+    return create_episode_dataframe(DATA)
+
+
+import pandas as pd
+
+def create_episode_dataframe(DATA):
+    episode_list = [episode for episodes in DATA for episode in episodes['Episodes']]
+    return pd.DataFrame(episode_list)
+
+
+import matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+fig, ax = plt.subplots()
