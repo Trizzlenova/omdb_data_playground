@@ -8,6 +8,11 @@ Created on Tue May 18 19:54:08 2021
 
 import requests
 import json
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
 
 key=KEY
 url = 'http://www.omdbapi.com/'
@@ -82,14 +87,22 @@ def convert_column_to_numeric(DATA, COLUMN_LIST):
     
 
 # TODO: see if clickable links can be added (click a cell to go to imdb ep page)
+df = get_and_save_season(URL, KEY, SHOW)
 ratings = pd.pivot_table(df, 'imdbRating', 'Season', 'numberInSeason')
-plt.figure(figsize=(12,8))
-sns.heatmap(ratings, annot=True, linewidths=1, cmap=mpl.cm.get_cmap('RdYlGn'))
+
+
+#
+plt.figure(figsize=(24,20))
+ax = sns.heatmap(ratings, annot=True, linewidths=1, cmap=mpl.cm.get_cmap('RdYlGn'))
+ax.xaxis.tick_top()
+ax.xaxis.set_label_position('top')
+ax.tick_params(length=0)
+ax.tick_params(axis='both', which='major', labelsize=24)
+ax.tick_params(axis='both', which='minor', labelsize=24)
+plt.rc('font', size=font_size)
+plt.rc('axes', titlesize=font_size)
+label_style = {'fontname':'Helvetica','fontsize':'24'}
+plt.xlabel('Episode Number', **label_style)
+plt.ylabel('Season', **label_style)
+plt.yticks(rotation=0)
 plt.show()
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-
-fig, ax = plt.subplots()
