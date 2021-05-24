@@ -125,11 +125,12 @@ def pivot_table_for_plot_setup(DATA):
     return ratings_df
     
     
-def create_line_plot(DATA):
+#TODO remove .5 increments in scatterplot
+def create_scatterplot_plot(DATA):
     points = plt.scatter(DATA['Season'], DATA['imdbRating'],
-                     c=DATA["imdbRating"], s=12, cmap=mpl.cm.get_cmap('RdYlGn'))
+                     c=DATA["imdbRating"], s=24, edgecolors='gray', cmap=mpl.cm.get_cmap('RdYlGn'))
     plt.colorbar(points)
-    return sns.regplot('Season', 'imdbRating', data=DATA, scatter=False, color=".3")
+    return sns.regplot('Season', 'imdbRating', data=DATA, scatter=False, logx=True, color='.3')
 
 
 
