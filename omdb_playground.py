@@ -120,37 +120,39 @@ df = get_and_save_season(URL, KEY, SHOW)
 
 def pivot_table_for_plot_setup(DATA):
     ratings_df = pd.pivot_table(DATA, 'imdbRating', 'Season', 'numberInSeason')
-    ratings_df['average_rating'] = ratings_df.mean(numeric_only=True, axis=True)
-    ratings_df['Season'] = ratings_df.index
+    #ratings_df['average_rating'] = ratings_df.mean(numeric_only=True, axis=True)
+    #ratings_df['Season'] = ratings_df.index
     return ratings_df
     
     
 def create_line_plot(DATA):
-    lines = DATA.plot.line(x='Season', y='average')
-    return lines
-
-
-#
-plt.figure(figsize=(24,20))
-ax = sns.heatmap(ratings, 
-                 annot=True, 
-                 linewidths=1, 
-                 cmap=mpl.cm.get_cmap('RdYlGn'), 
-                 cbar=False)
-ax.xaxis.tick_top()
-ax.xaxis.set_label_position('top')
-ax.tick_params(length=0)
-ax.tick_params(axis='both', which='major', labelsize=24)
-ax.tick_params(axis='both', which='minor', labelsize=24)
-font_size = 24
-plt.rc('font', size=font_size)
-plt.rc('axes', titlesize=font_size)
-label_style = {'fontname':'Helvetica','fontsize':font_size}
-plt.xlabel('Episode', **label_style)
-plt.ylabel('Season', **label_style)
-plt.yticks(rotation=0)
-ax.grid(False)
-plt.show()
+    points = plt.scatter(DATA['Season'], DATA['imdbRating'],
+                     c=DATA["imdbRating"], s=12, cmap=mpl.cm.get_cmap('RdYlGn'))
+    plt.colorbar(points)
+    return sns.regplot('Season', 'imdbRating', data=DATA, scatter=False, color=".3")
 
 
 
+def create_heatmap(DATA):
+    plt.figure(figsize=(24,20))
+    ratings = pivot_table_for_plot_setup(DATA)
+    ax = sns.heatmap(ratings, 
+                     annot=True, 
+                     linewidths=1, 
+                     cmap=mpl.cm.get_cmap('RdYlGn'), 
+                     cbar=False)
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position('top')
+    ax.tick_params(length=0)
+    ax.tick_params(axis='both', which='major', labelsize=24)
+    ax.tick_params(axis='both', which='minor', labelsize=24)
+    font_size = 24
+    plt.rc('font', size=font_size)
+    plt.rc('axes', titlesize=font_size)
+    label_style = {'fontname':'Helvetica','fontsize':font_size}
+    plt.xlabel('Episode', **label_style)
+    plt.ylabel('Season', **label_style)
+    plt.yticks(rotation=0)
+    ax.grid(False)
+    return ax
+    
